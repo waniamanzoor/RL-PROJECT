@@ -1,7 +1,7 @@
 fastapi
 uvicorn
 sqlalchemy
-numpy==1.26.4
+numpy
 torch
 pydantic
 gymnasium
