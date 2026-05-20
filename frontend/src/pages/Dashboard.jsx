@@ -1,6 +1,14 @@
 import { useEffect, useState } from "react";
 import { getTasks, getRecommendation, logEnergy, getWeeklyReport } from "../api/api";
 
+function deadlineLabel(deadline) {
+  if (!deadline) return "No deadline";
+  const days = Math.ceil((new Date(deadline) - new Date()) / 86400000);
+  if (days === 0) return "Due today";
+  if (days < 0) return `Overdue by ${Math.abs(days)} days`;
+  return `Due in ${days} days`;
+}
+
 function EnergySlider({ value, onChange, onSubmit }) {
   const labels = ["", "Very Low", "Low", "Moderate", "High", "Peak"];
   return (
@@ -59,7 +67,7 @@ function RecommendedTask({ task, productivity }) {
           Priority: {priorityLabel}
         </span>
         <span className="bg-white px-2 py-1 rounded-md border border-indigo-200">
-          Deadline: {task.deadline}d left
+          {deadlineLabel(task.deadline)}
         </span>
         <span className="bg-white px-2 py-1 rounded-md border border-indigo-200">
           Productivity: {(productivity * 100).toFixed(0)}%
@@ -145,7 +153,7 @@ export default function Dashboard() {
               <li key={t.id} className="py-3 flex items-center justify-between">
                 <div>
                   <p className="text-sm font-medium text-slate-700">{t.title}</p>
-                  <p className="text-xs text-slate-400">{t.category} · {t.deadline_days}d left</p>
+                  <p className="text-xs text-slate-400">{t.category} · {deadlineLabel(t.deadline)}</p>
                 </div>
                 <span className={`text-xs px-2 py-1 rounded-full font-medium
                   ${t.priority === 3 ? "bg-red-100 text-red-600" :

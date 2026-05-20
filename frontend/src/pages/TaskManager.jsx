@@ -13,7 +13,7 @@ const EMPTY_FORM = {
   category: "coding",
   priority: 2,
   effort: 1,
-  deadline_days: 7,
+  deadline: "",
 };
 
 function AddTaskModal({ onClose, onCreated }) {
@@ -34,7 +34,6 @@ function AddTaskModal({ onClose, onCreated }) {
         ...form,
         priority: Number(form.priority),
         effort: Number(form.effort),
-        deadline_days: Number(form.deadline_days),
       });
       onCreated();
       onClose();
@@ -94,7 +93,7 @@ function AddTaskModal({ onClose, onCreated }) {
 
           <div className="grid grid-cols-2 gap-3">
             <div>
-              <label className="block text-xs font-medium text-slate-600 mb-1">Effort (hours)</label>
+              <label className="block text-xs font-medium text-slate-600 mb-1">Effort (25-min slots)</label>
               <input
                 type="number"
                 min={1}
@@ -105,13 +104,11 @@ function AddTaskModal({ onClose, onCreated }) {
               />
             </div>
             <div>
-              <label className="block text-xs font-medium text-slate-600 mb-1">Deadline (days)</label>
+              <label className="block text-xs font-medium text-slate-600 mb-1">Deadline</label>
               <input
-                type="number"
-                min={1}
-                max={30}
-                value={form.deadline_days}
-                onChange={set("deadline_days")}
+                type="date"
+                value={form.deadline}
+                onChange={set("deadline")}
                 className="w-full border border-slate-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-400"
               />
             </div>
@@ -141,10 +138,24 @@ function AddTaskModal({ onClose, onCreated }) {
   );
 }
 
+function deadlineDays(deadline) {
+  if (!deadline) return null;
+  return Math.ceil((new Date(deadline) - new Date()) / 86400000);
+}
+
+function deadlineLabel(deadline) {
+  const days = deadlineDays(deadline);
+  if (days === null) return "No deadline";
+  if (days === 0) return "Due today";
+  if (days < 0) return `Overdue by ${Math.abs(days)} days`;
+  return `Due in ${days} days`;
+}
+
 function TaskRow({ task, onComplete }) {
   const [confirming, setConfirming] = useState(false);
   const priority = PRIORITIES.find((p) => p.value === task.priority);
-  const deadlineUrgent = task.deadline_days <= 2;
+  const days = deadlineDays(task.deadline);
+  const deadlineUrgent = days !== null && days <= 2;
 
   return (
     <tr className="border-t border-slate-100 hover:bg-slate-50 transition-colors">
@@ -162,7 +173,7 @@ function TaskRow({ task, onComplete }) {
       <td className="py-3 px-4 text-sm text-slate-600 text-center">{task.effort}h</td>
       <td className="py-3 px-4 text-center">
         <span className={`text-xs font-medium ${deadlineUrgent ? "text-red-600" : "text-slate-500"}`}>
-          {deadlineUrgent ? "⚠️ " : ""}{task.deadline_days}d
+          {deadlineUrgent ? "⚠️ " : ""}{deadlineLabel(task.deadline)}
         </span>
       </td>
       <td className="py-3 px-4 text-right">

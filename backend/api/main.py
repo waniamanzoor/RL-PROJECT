@@ -220,3 +220,8 @@ def weekly_report(db: Session = Depends(get_db)):
         "average_energy":   avg_energy,
         "total_sessions":   len(energy_logs),
     }
+# ── Health check ───────────────────────────────────────────────────────────────
+
+@app.get("/health")
+def health():
+    return {"status": "ok"}

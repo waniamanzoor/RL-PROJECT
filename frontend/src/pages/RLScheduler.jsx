@@ -1,6 +1,14 @@
 import { useState, useEffect, useRef } from "react";
 import { getRecommendation, logEnergy } from "../api/api";
 
+function deadlineLabel(deadline) {
+  if (!deadline) return "No deadline";
+  const days = Math.ceil((new Date(deadline) - new Date()) / 86400000);
+  if (days === 0) return "Due today";
+  if (days < 0) return `Overdue by ${Math.abs(days)} days`;
+  return `Due in ${days} days`;
+}
+
 const FOCUS_DURATIONS = [
   { label: "25 min", seconds: 25 * 60 },
   { label: "45 min", seconds: 45 * 60 },
@@ -72,7 +80,7 @@ function RecommendedCard({ rec, productivity, onStart }) {
           Priority: {priorityLabel}
         </span>
         <span className="bg-white/20 px-3 py-1 rounded-full text-white text-xs font-medium">
-          Deadline: {rec.deadline}d left
+          {deadlineLabel(rec.deadline)}
         </span>
         <span className="bg-white/20 px-3 py-1 rounded-full text-white text-xs font-medium">
           Productivity: {(productivity * 100).toFixed(0)}%
