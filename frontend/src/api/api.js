@@ -21,13 +21,3 @@ export const logEnergy = (energy_level) =>
 
 // Reports
 export const getWeeklyReport = () => api.get("/report/weekly");
-
-// Health check
-export const checkHealth = async () => {
-  try {
-    const res = await fetch(`${BASE_URL}/health`, { signal: AbortSignal.timeout(3000) });
-    return res.ok ? "connected" : "disconnected";
-  } catch {
-    return "disconnected";
-  }
-};

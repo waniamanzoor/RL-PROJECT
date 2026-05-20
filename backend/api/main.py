@@ -9,7 +9,7 @@ import torch
 import os
 import sys
 
-sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.dirname(__file__))))
+sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.dirname(_file_))))
 
 from backend.database.models import Task, TimeLog, EnergyLog, get_db
 from backend.rl.task_env import TaskSchedulerEnv
@@ -220,8 +220,3 @@ def weekly_report(db: Session = Depends(get_db)):
         "average_energy":   avg_energy,
         "total_sessions":   len(energy_logs),
     }
-# ── Health check ───────────────────────────────────────────────────────────────
-
-@app.get("/health")
-def health():
-    return {"status": "ok"}

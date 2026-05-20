@@ -67,7 +67,7 @@ function RecommendedCard({ rec, productivity, onStart }) {
       <div className="flex items-start justify-between mb-4">
         <div>
           <p className="text-indigo-200 text-xs font-medium uppercase tracking-wide mb-1">
-            🤖 RL Agent Recommends
+            RL Agent Recommends
           </p>
           <h2 className="text-2xl font-bold leading-tight">{rec.title}</h2>
         </div>
@@ -328,7 +328,7 @@ export default function RLScheduler() {
             disabled={loading}
             className="w-full bg-indigo-600 hover:bg-indigo-700 disabled:opacity-60 text-white font-semibold py-3 rounded-xl transition-colors text-sm"
           >
-            {loading ? "Asking the RL agent..." : "🤖 What should I do next?"}
+            {loading ? "Asking the RL agent..." : "What should I do next?"}
           </button>
           {error && (
             <p className="text-xs text-red-500 text-center">{error}</p>

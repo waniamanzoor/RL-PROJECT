@@ -3,6 +3,7 @@ import {
   BarChart, Bar, LineChart, Line, PieChart, Pie, Cell,
   XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer,
 } from "recharts";
+import jsPDF from "jspdf";
 import { getWeeklyReport } from "../api/api";
 
 // Generate plausible last-7-days data for charts the backend doesn't track per-day
@@ -54,18 +55,79 @@ export default function Analytics() {
   }, []);
 
   const handleExport = () => {
-    const payload = {
-      exported_at: new Date().toISOString(),
-      summary: report,
-      daily_breakdown: weekData,
-    };
-    const blob = new Blob([JSON.stringify(payload, null, 2)], { type: "application/json" });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement("a");
-    a.href = url;
-    a.download = `rl_scheduler_report_${new Date().toISOString().slice(0, 10)}.json`;
-    a.click();
-    URL.revokeObjectURL(url);
+    const doc = new jsPDF();
+    const date = new Date().toISOString().slice(0, 10);
+    const primary = [99, 102, 241];
+
+    doc.setFillColor(...primary);
+    doc.rect(0, 0, 210, 28, "F");
+    doc.setTextColor(255, 255, 255);
+    doc.setFontSize(16);
+    doc.setFont("helvetica", "bold");
+    doc.text("RL Task Scheduler — Weekly Report", 14, 18);
+
+    doc.setTextColor(100, 116, 139);
+    doc.setFontSize(9);
+    doc.setFont("helvetica", "normal");
+    doc.text(`Exported: ${date}`, 14, 36);
+
+    doc.setDrawColor(226, 232, 240);
+    doc.line(14, 40, 196, 40);
+
+    doc.setFontSize(11);
+    doc.setFont("helvetica", "bold");
+    doc.setTextColor(30, 41, 59);
+    doc.text("Summary", 14, 50);
+
+    const summary = [
+      ["Tasks Completed", report?.completed_tasks ?? "—"],
+      ["Tasks Pending", report?.pending_tasks ?? "—"],
+      ["Average Energy", report?.average_energy ?? "—"],
+      ["Sessions Logged", report?.total_sessions ?? "—"],
+    ];
+    doc.setFontSize(10);
+    doc.setFont("helvetica", "normal");
+    summary.forEach(([label, val], i) => {
+      const y = 60 + i * 9;
+      doc.setTextColor(100, 116, 139);
+      doc.text(label, 14, y);
+      doc.setTextColor(30, 41, 59);
+      doc.setFont("helvetica", "bold");
+      doc.text(String(val), 80, y);
+      doc.setFont("helvetica", "normal");
+    });
+
+    doc.line(14, 100, 196, 100);
+
+    doc.setFontSize(11);
+    doc.setFont("helvetica", "bold");
+    doc.setTextColor(30, 41, 59);
+    doc.text("Daily Breakdown", 14, 110);
+
+    const headers = ["Day", "Completed", "Energy", "Productivity"];
+    const colX = [14, 60, 110, 155];
+    doc.setFontSize(9);
+    doc.setTextColor(100, 116, 139);
+    headers.forEach((h, i) => doc.text(h, colX[i], 120));
+    doc.line(14, 122, 196, 122);
+
+    doc.setTextColor(30, 41, 59);
+    weekData.forEach((row, i) => {
+      const y = 130 + i * 9;
+      if (i % 2 === 0) {
+        doc.setFillColor(248, 250, 252);
+        doc.rect(14, y - 5, 182, 8, "F");
+      }
+      doc.text(row.day, colX[0], y);
+      doc.text(String(row.completed), colX[1], y);
+      doc.text(String(row.energy), colX[2], y);
+      doc.text(`${row.productivity}%`, colX[3], y);
+    });
+
+    doc.setTextColor(148, 163, 184);
+    doc.setFontSize(8);
+
+    doc.save(`rl_scheduler_report_${date}.pdf`);
   };
 
   const completedTotal = report?.completed_tasks ?? 0;

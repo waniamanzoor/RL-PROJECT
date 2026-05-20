@@ -1,67 +1,58 @@
 import { NavLink } from "react-router-dom";
-import { useEffect, useState } from "react";
-import { checkHealth } from "../api/api";
+import { Home, ClipboardList, BarChart2, Scale, Settings } from "lucide-react";
 
-const links = [
-  { to: "/", label: "Dashboard", icon: "🏠" },
-  { to: "/tasks", label: "Task Manager", icon: "📋" },
-  { to: "/scheduler", label: "RL Scheduler", icon: "🤖" },
-  { to: "/analytics", label: "Analytics", icon: "📊" },
-  { to: "/comparison", label: "Comparison", icon: "⚖️" },
-  { to: "/settings", label: "Settings", icon: "⚙️" },
+const mainLinks = [
+  { to: "/", label: "Dashboard", Icon: Home },
+  { to: "/tasks", label: "Task Manager", Icon: ClipboardList },
+  { to: "/analytics", label: "Analytics", Icon: BarChart2 },
+  { to: "/comparison", label: "Comparison", Icon: Scale },
 ];
 
-const statusConfig = {
-  connected:    { bg: "bg-green-50",  text: "text-green-600",  dot: "bg-green-500",  label: "Connected" },
-  disconnected: { bg: "bg-red-50",    text: "text-red-600",    dot: "bg-red-500",    label: "Disconnected" },
-  checking:     { bg: "bg-yellow-50", text: "text-yellow-600", dot: "bg-yellow-400", label: "Checking..." },
-};
-
 export default function Sidebar() {
-  const [status, setStatus] = useState("checking");
-
-  useEffect(() => {
-    const check = async () => setStatus(await checkHealth());
-    check();
-    const interval = setInterval(check, 10000);
-    return () => clearInterval(interval);
-  }, []);
-
-  const s = statusConfig[status];
-
   return (
-    <aside className="w-60 min-h-screen bg-white border-r border-slate-200 flex flex-col py-6 px-4 fixed top-0 left-0">
-      <div className="mb-8 flex items-start justify-between">
-        <div>
-          <h1 className="text-lg font-bold text-indigo-600 leading-tight">
-            Task Scheduler
-          </h1>
-          <p className="text-xs text-slate-400 mt-1">RL-Powered · CT-469</p>
-        </div>
-        <div className={`flex items-center gap-1.5 px-2 py-1 rounded-md ${s.bg}`}>
-          <span className={`w-1.5 h-1.5 rounded-full ${s.dot}`} />
-          <span className={`text-xs font-medium ${s.text}`}>{s.label}</span>
+    <aside className="w-44 min-h-screen bg-white border-r border-slate-200 flex flex-col py-5 px-3 fixed top-0 left-0 z-40">
+      <div className="px-2 mb-7">
+        <div className="flex items-center gap-2">
+          <div className="w-7 h-7 bg-indigo-600 rounded-lg flex items-center justify-center flex-shrink-0">
+            <span className="text-white text-xs font-bold">RL</span>
+          </div>
+          <span className="text-sm font-bold text-slate-800">Scheduler</span>
         </div>
       </div>
-      <nav className="flex flex-col gap-1">
-        {links.map(({ to, label, icon }) => (
+
+      <nav className="flex flex-col gap-1 flex-1">
+        {mainLinks.map(({ to, label, Icon }) => (
           <NavLink
             key={to}
             to={to}
             end={to === "/"}
             className={({ isActive }) =>
-              `flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium transition-colors ${
+              `flex items-center gap-2.5 px-3 py-2 rounded-xl text-sm font-medium transition-colors ${
                 isActive
-                  ? "bg-indigo-50 text-indigo-600"
-                  : "text-slate-600 hover:bg-slate-100"
+                  ? "bg-indigo-600 text-white"
+                  : "text-slate-500 hover:bg-slate-100 hover:text-slate-700"
               }`
             }
           >
-            <span>{icon}</span>
+            <Icon size={16} strokeWidth={1.75} />
             {label}
           </NavLink>
         ))}
       </nav>
+
+      <NavLink
+        to="/settings"
+        className={({ isActive }) =>
+          `flex items-center gap-2.5 px-3 py-2 rounded-xl text-sm font-medium transition-colors ${
+            isActive
+              ? "bg-indigo-600 text-white"
+              : "text-slate-500 hover:bg-slate-100 hover:text-slate-700"
+          }`
+        }
+      >
+        <Settings size={16} strokeWidth={1.75} />
+        Settings
+      </NavLink>
     </aside>
   );
 }
