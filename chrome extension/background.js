@@ -1,3 +1,5 @@
+// background.js
+
 let activeTab = null;
 let startTime = null;
 const BACKEND_URL = "https://rl-project-api.onrender.com";
